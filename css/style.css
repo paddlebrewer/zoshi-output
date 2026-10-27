@@ -1,0 +1,475 @@
+/* ============================================================
+   style.css — 蔵置所 出庫記録アプリ
+   方針：スタッフ各自のスマホ（縦・片手）。大きな文字・大きなボタン。
+   ============================================================ */
+
+:root {
+  --color-bg: #ffffff;          /* 白ベース（新居さん指示 2026-07-08） */
+  --color-surface: #f5f6f7;     /* ごく薄いグレー（押下時・補助面） */
+  --color-primary: #e6961e;
+  --color-primary-dark: #c97c0d;
+  --color-text: #1f2328;
+  --color-text-sub: #6b7280;    /* 補助テキスト（ヒント・単位・ラベル） */
+  --color-border: #d5d9de;
+  --color-danger: #b3261e;
+  --color-white: #ffffff;
+  --radius: 14px;
+}
+
+* { box-sizing: border-box; }
+
+/* hidden属性は必ず効かせる。
+   （.primary-btn等の display 指定が hidden を打ち消し、原料名を選ばず「次へ」を
+     押せてしまう不具合の原因になったため。2026-07-08 修正） */
+[hidden] { display: none !important; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: "Hiragino Sans", "Yu Gothic", "Meiryo", system-ui, sans-serif;
+  font-size: 18px;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+#app-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  background: var(--color-primary);
+  color: var(--color-white);
+}
+
+#app-header h1 {
+  flex: 1;
+  margin: 0;
+  font-size: 1.15em;
+  text-align: center;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  color: var(--color-white);
+  font-size: 1em;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+.badge {
+  background: var(--color-danger);
+  color: var(--color-white);
+  border-radius: 999px;
+  min-width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85em;
+  padding: 0 8px;
+}
+
+#app-main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 18px 16px 60px;
+}
+
+.screen[hidden] { display: none; }
+
+.lead {
+  font-size: 1.3em;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* ── ホーム画面：メニュー ── */
+/* ホームの4ボタン：画面の高さを使い切って大きく見せる。
+   醸造所では濡れた手・手袋で押すため、当たり判定を最優先する（2026-09-14 iPad実寸で調整） */
+.menu-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-auto-rows: 1fr;
+  gap: 16px;
+  /* 上2行（4ボタン）が残りの高さを分け合い、3行目の出荷は中身なりの高さにする。
+     grid-auto-rows:1fr のままだと出荷の追加で4ボタンが1/3に縮む（2026-10-19） */
+  grid-template-rows: 1fr 1fr auto;
+  /* ヘッダー・リード文・フッターを除いた残り全部を使う */
+  min-height: min(56vh, 520px);
+}
+
+.menu-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 28px 12px;
+  font-size: 1.3em;
+  border-radius: var(--radius);
+  border: 2px solid var(--color-border);
+  background: var(--color-white);
+  color: var(--color-text);
+  line-height: 1.5;
+}
+
+.menu-btn--active {
+  border-color: var(--color-primary);
+  background: var(--color-white);
+  font-weight: bold;
+}
+
+/* 出荷ボタン：2列を横断して1行まるごと使う（2026-10-19 出荷画面追加）。
+   高さは他の4つの半分程度に抑え、2×2の当たり判定を削らない。 */
+.menu-btn--wide {
+  grid-column: 1 / -1;
+  flex-direction: row;
+  gap: 12px;
+  padding: 18px 12px;
+}
+.menu-btn--wide .menu-ico {
+  margin-bottom: 0;
+  font-size: 1.6em;
+}
+
+.menu-btn:disabled {
+  opacity: 0.45;
+}
+
+.menu-btn small {
+  font-size: 0.5em;
+  font-weight: normal;
+}
+
+/* ボタン内の絵文字を大きく＝一瞬で見分けられるように */
+.menu-ico {
+  font-size: 2.1em;
+  line-height: 1.1;
+  margin-bottom: 8px;
+}
+.menu-label {
+  line-height: 1.3;
+}
+
+.home-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 28px;
+}
+
+.status-line {
+  text-align: center;
+  margin-top: 20px;
+  color: var(--color-text-sub);
+}
+
+/* ── ボタン共通 ── */
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.primary-btn {
+  display: block;
+  width: 100%;
+  padding: 18px;
+  margin-top: 18px;
+  font-size: 1.15em;
+  font-weight: bold;
+  color: var(--color-white);
+  background: var(--color-primary);
+  border: none;
+  border-radius: var(--radius);
+}
+.primary-btn:active { background: var(--color-primary-dark); }
+
+.primary-btn--big {
+  padding: 24px;
+  font-size: 1.3em;
+}
+
+.secondary-btn {
+  display: block;
+  width: 100%;
+  padding: 16px;
+  margin-top: 12px;
+  font-size: 1em;
+  color: var(--color-text);
+  background: var(--color-white);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: var(--color-primary-dark);
+  text-decoration: underline;
+  font-size: 0.95em;
+  padding: 8px;
+}
+
+/* ── ウィザード ── */
+.step-indicator {
+  text-align: center;
+  color: var(--color-text-sub);
+  margin-bottom: 6px;
+}
+
+#screen-wizard h2, #screen-confirm h2, #screen-settings h2, #screen-history h2 {
+  text-align: center;
+  font-size: 1.5em;
+  margin: 6px 0 4px;
+}
+
+.hint {
+  text-align: center;
+  color: var(--color-text-sub);
+  margin-bottom: 18px;
+  font-size: 0.95em;
+}
+
+/* textContent に入れた改行をそのまま表示する（設定画面のマスター状態＝原料／製品の2行） */
+.hint-multiline {
+  white-space: pre-line;
+}
+
+.choice-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.choice-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 55vh;
+  overflow-y: auto;
+}
+
+.choice-btn {
+  padding: 22px 14px;
+  font-size: 1.2em;
+  border-radius: var(--radius);
+  border: 2px solid var(--color-border);
+  background: var(--color-white);
+  color: var(--color-text);
+}
+.choice-btn:active { background: var(--color-surface); border-color: var(--color-primary); }
+
+.choice-btn--list {
+  padding: 16px 14px;
+  font-size: 1.05em;
+  text-align: left;
+}
+
+/* 出荷：その出荷先で過去いちばん多く使われている区分／在庫の残り本数 */
+.choice-btn--recommended {
+  border-color: var(--color-primary);
+  font-weight: bold;
+}
+
+.choice-sub {
+  color: var(--color-text-sub);
+  font-weight: normal;
+  font-size: 0.8em;
+}
+
+.text-input {
+  display: block;
+  width: 100%;
+  padding: 16px;
+  font-size: 1.3em;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-white);
+  color: var(--color-text);
+}
+
+.text-input--number {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.unit-note {
+  text-align: right;
+  color: var(--color-text-sub);
+  margin-top: 6px;
+}
+
+.error-line {
+  color: var(--color-danger);
+  text-align: center;
+  font-weight: bold;
+  margin-top: 14px;
+}
+
+.block-message {
+  background: var(--color-surface);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 14px;
+}
+.block-message p { margin: 0 0 8px; }
+
+.wizard-nav { margin-top: 10px; }
+
+/* ── 確認画面 ── */
+.confirm-note {
+  background: #fff8e1;
+  border: 1px solid #e0b84c;
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin: 0 0 14px;
+  color: #7a5b00;
+  font-size: 0.95em;
+}
+.confirm-note[hidden] { display: none !important; }
+
+.confirm-list {
+  list-style: none;
+  margin: 0 0 10px;
+  padding: 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.confirm-list li {
+  display: flex;
+  justify-content: space-between;
+  padding: 14px 4px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.confirm-label {
+  color: var(--color-text-sub);
+}
+
+.confirm-value {
+  font-weight: bold;
+  text-align: right;
+}
+
+/* ── 結果画面 ── */
+.result-icon {
+  text-align: center;
+  font-size: 3.5em;
+  margin: 10px 0 0;
+}
+
+#screen-result h2 {
+  text-align: center;
+  font-size: 1.4em;
+}
+
+/* ── 設定・履歴 ── */
+.field-label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+textarea.text-input {
+  font-size: 1em;
+  font-family: monospace;
+}
+
+.list {
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 0;
+}
+
+.list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 6px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+hr {
+  border: none;
+  border-top: 1px solid var(--color-border);
+  margin: 28px 0;
+}
+
+/* ── モーダル ── */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+.modal[hidden] { display: none; }
+
+.modal-box {
+  background: var(--color-white);
+  border-radius: var(--radius);
+  padding: 24px;
+  max-width: 420px;
+  width: 88%;
+}
+
+.modal-box p {
+  font-size: 1.15em;
+  text-align: center;
+  margin: 0 0 18px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+}
+.modal-actions button { flex: 1; margin-top: 0; }
+
+/* ── プルダウン（仕入先・メーカー） ── */
+select.select-input {
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: var(--color-white);
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%236b7280' d='M4 6l4 4 4-4z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 20px;
+  padding-right: 48px;
+}
+
+/* 「その他（手入力）」選択時のみJSがdisplay:blockにする */
+.other-input {
+  display: none;
+  margin-top: 12px;
+}
+
+/* ── 出庫フォーム ── */
+.field-label { display:block; font-weight:bold; margin:18px 0 6px; }
+.notice { background:#fff8e1; border:1px solid #e0b84c; border-radius:var(--radius); padding:10px 12px; color:#7a5b00; font-size:0.9em; margin-bottom:6px; }
+.choice-grid--channels { grid-template-columns: 1fr 1fr; gap:10px; }
+.choice-btn--on { border-color: var(--color-primary); background:#fff3dd; font-weight:bold; }
+#channel-grid .choice-btn { padding:16px 8px; font-size:1.05em; }
+.item-card { border:2px solid var(--color-border); border-radius:var(--radius); padding:12px; margin-bottom:12px; }
+.item-card__head { display:flex; justify-content:space-between; align-items:center; color:var(--color-text-sub); font-size:0.9em; margin-bottom:6px; }
+.item-remove { background:none; border:none; color:var(--color-danger); font-size:0.9em; padding:6px; }
+.item-card select.text-input { margin-bottom:8px; }
+.qty-row { display:flex; gap:10px; align-items:center; }
+.qty-row .text-input { flex:1; min-width:0; }
+.unit-toggle { display:flex; flex:none; border:2px solid var(--color-border); border-radius:var(--radius); overflow:hidden; }
+.unit-toggle button { border:none; background:var(--color-white); padding:14px 12px; font-size:0.95em; color:var(--color-text); }
+.unit-toggle button.on { background:var(--color-primary); color:#fff; font-weight:bold; }
+.qty-note { color:var(--color-text-sub); font-size:0.9em; margin-top:4px; text-align:right; }
+.home-footer { margin-top: 22px; }
+.list-item { flex-direction:column; align-items:flex-start; gap:2px; }
+.list-item small { color:var(--color-text-sub); }
+.state-ok { color:#1e7e34; } .state-warn { color:#b86e00; } .state-bad { color:var(--color-danger); }
