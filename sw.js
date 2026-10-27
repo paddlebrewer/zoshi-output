@@ -6,7 +6,7 @@
 // キャッシュ対象はアプリ「殻」のみ（送信先URL・マスターデータ・記録内容はキャッシュしない＝localStorage側の責務）。
 // ============================================================
 
-const CACHE_NAME = 'zoshi-output-v1';
+const CACHE_NAME = 'zoshi-output-v2';
 const APP_SHELL = [
   './',
   './index.html',

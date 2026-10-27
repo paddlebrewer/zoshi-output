@@ -211,7 +211,7 @@
       var inHistory = core.getHistory().some(function (h) { return h.uuid === item.uuid; });
       var q = core.getQueue().filter(function (x) { return x.uuid === item.uuid; })[0];
       if (inHistory) showResult('ok', '記録しました', '表に入ったことを確認しました。');
-      else if (q && q.held) showResult('bad', '確認できませんでした', '再送はしていません。新居さんに伝えてください。');
+      else if (q && q.held) showResult('bad', '確認できませんでした', '再送はしていません。システム責任者（新居）に伝えてください。');
       else if (res.offline) showResult('wait', 'このスマホに保存しました', '電波がつながったら自動で送ります。履歴画面で状態を見られます。');
       else showResult('wait', '送信しました（確認待ち）', '表への反映は次に開いたとき確認します。');
     } finally {
@@ -296,7 +296,7 @@
       $('settings-msg').textContent = '保存しました。銘柄・容器を取得しています…';
       var r = await refreshMasters();
       $('settings-msg').textContent = r.source === 'live' ? '保存しました。使えます。' : '保存しましたが、一覧を取得できませんでした：' + (r.error || '');
-      if (r.source === 'live') { resetForm(true); renderForm(); }
+      if (r.source === 'live') { resetForm(true); renderForm(); setTimeout(function () { show('form'); }, 1200); }
     };
     $('btn-refresh-masters').onclick = async function () { await refreshMasters(); resetForm(true); renderForm(); };
     window.addEventListener('online', function () { flushAndRefresh(); });
